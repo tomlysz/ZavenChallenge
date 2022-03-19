@@ -21,7 +21,7 @@ namespace ZavenDotNetInterview.App.Services
             var log = new Log
             {
                 Id = Guid.NewGuid(),
-                CreatedAt = DateTime.Now,
+                CreatedAt = DateTime.UtcNow,
                 Description = description,
                 JobId = jobId
             };

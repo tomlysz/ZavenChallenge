@@ -66,7 +66,7 @@ namespace ZavenDotNetInterview.App.Controllers
                             return View(data);
                         }
 
-                        Job newJob = new Job() { Id = Guid.NewGuid(), DoAfter = data.DoAfter, Name = data.Name, Status = JobStatus.New };
+                        Job newJob = new Job() { Id = Guid.NewGuid(), DoAfter = data.DoAfter, Name = data.Name, Status = JobStatus.New, LastUpdatedAt = DateTime.UtcNow };
                         newJob = _ctx.Jobs.Add(newJob);
 
                         if (_ctx.SaveChanges() >0)
