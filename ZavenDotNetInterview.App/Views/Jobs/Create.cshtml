@@ -1,12 +1,95 @@
-﻿@*TODO: Use Razor Syntax*@
+﻿@model ZavenDotNetInterview.App.Models.ViewModels.JobDataViewModel
 @{
     ViewBag.Title = "Create";
 }
 
 <h2>Create</h2>
 
-<form action="/Jobs/Create" method="post">
-    Name: <input type="text" name="Name" placeholder="Name" />
-    Do after: <input type="datetime" name="DoAfter" placeholder="RRRR-MM-DD" />
-    <input type="submit" value="Add Task" />
-</form>
+<div class="container">
+    <div class=" col-lg-8">
+        <form id="jobForm" action="/Jobs/Create" method="post">
+            @Html.ValidationSummary(false, "", new { @class = "text-danger" })
+            <div class="form-group">
+                <label for="Name">
+                    Name:
+                </label>
+                <input class="form-control" type="text" name="Name" placeholder="Name" />
+                <h5 id="nameVal" class="text-danger" />
+            </div>
+            <div class="form-group">
+                <label for="DoAfter">
+                    Do after:
+                </label>
+                <input class="form-control" type="datetime" name="DoAfter" placeholder="RRRR-MM-DD" />
+                <h5 id="doAfterVal" class="text-danger" />
+            </div>            
+            <input class="btn btn-success" id="sendForm" type="submit" value="Add Task" />
+        </form>
+    </div>
+</div>
+@section scripts{
+
+    <script type="text/javascript">
+
+        $(function () {
+            $('#jobForm').submit(function () {
+                return validate();
+            })
+
+            function validate() {
+                let validateNameResult = validateName();
+                let validateDoAfterResult = validateDoAfter();
+
+                if (validateNameResult && validateDoAfterResult)
+                    return true;
+                else
+                    return false;
+            }
+
+            function validateName() {
+                let name = $('input[name="Name"]').val();
+                let valTextSelector = '#nameVal'
+
+                if (name === '') {
+                    showText(valTextSelector, 'Name cannot be empty.');
+                    return false;
+                } else {
+                    showText(valTextSelector, '');
+                    return true;
+                }
+            }
+
+            function validateDoAfter() {
+                let doAfter = $('input[name="DoAfter"]').val();
+                let dateRegex = /^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$/;
+                let isDate = doAfter.match(dateRegex);
+                let valTextSelector = '#doAfterVal'
+
+                if (doAfter !== '') {
+                    if (!isDate) {
+                        showText(valTextSelector, 'It is not a valid date.');
+                        return false;
+                    } else {
+                        showText(valTextSelector, '');
+                        return true;
+                    }
+                } else {
+                    showText(valTextSelector, '');
+                    return true;
+                }
+            }
+
+            function showText(selector, text) {
+                if (text !== '') {
+                    $(selector).show();
+                    $(selector).html(text);
+                } else {
+                    $(selector).hide();
+                    $(selector).html(text);
+                }
+            }
+        })
+
+    </script>
+
+}

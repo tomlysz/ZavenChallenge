@@ -29,7 +29,7 @@ namespace ZavenDotNetInterview.App.Services
                         
             _ctx.SaveChanges();
 
-            Parallel.ForEach(jobsToProcess, (currentjob) =>
+            var asd = Parallel.ForEach(jobsToProcess, (currentjob) =>
             {
                 new Task(async () =>
                 {

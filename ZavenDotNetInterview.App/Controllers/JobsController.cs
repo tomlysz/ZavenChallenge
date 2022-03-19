@@ -5,6 +5,7 @@ using System.Web;
 using System.Web.Mvc;
 using ZavenDotNetInterview.App.Models;
 using ZavenDotNetInterview.App.Models.Context;
+using ZavenDotNetInterview.App.Models.ViewModels;
 using ZavenDotNetInterview.App.Repositories;
 using ZavenDotNetInterview.App.Services;
 
@@ -40,29 +41,40 @@ namespace ZavenDotNetInterview.App.Controllers
 
         // GET: Tasks/Create
         public ActionResult Create()
-        {
-            return View();
+        {            
+            return View(new JobDataViewModel());
         }
 
         // POST: Tasks/Create
         [HttpPost]
-        public ActionResult Create(string name, DateTime doAfter)
+        public ActionResult Create(JobDataViewModel data)
         {
-            try
+            if (ModelState.IsValid)
             {
-                using (ZavenDotNetInterviewContext _ctx = new ZavenDotNetInterviewContext())
+                try
                 {
-                    Job newJob = new Job() { Id = Guid.NewGuid(), DoAfter = doAfter, Name = name, Status = JobStatus.New };
-                    newJob = _ctx.Jobs.Add(newJob);
-                    _ctx.SaveChanges();
-                }
+                    using (ZavenDotNetInterviewContext _ctx = new ZavenDotNetInterviewContext())
+                    {
+                        var jobFromDb = _ctx.Jobs.FirstOrDefault(j => j.Name == data.Name);
+                        if(jobFromDb!= null)
+                        {
+                            ModelState.AddModelError("Name", "Name is already taken.");
+                            return View(data);
+                        }
 
-                return RedirectToAction("Index");
+                        Job newJob = new Job() { Id = Guid.NewGuid(), DoAfter = data.DoAfter, Name = data.Name, Status = JobStatus.New };
+                        newJob = _ctx.Jobs.Add(newJob);
+                        _ctx.SaveChanges();
+                    }
+
+                    return RedirectToAction("Index");
+                }
+                catch
+                {
+                    return View(data);
+                }
             }
-            catch
-            {
-                return View();
-            }
+            return View(data);
         }
 
         public ActionResult Details(Guid jobId)
