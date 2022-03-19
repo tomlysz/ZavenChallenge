@@ -48,6 +48,8 @@ namespace ZavenDotNetInterview.App
             container.RegisterType<IJobsRepository, JobsRepository>(new ContainerControlledLifetimeManager());
             container.RegisterInstance<ZavenDotNetInterviewContext>(new ZavenDotNetInterviewContext(), InstanceLifetime.Singleton);
             container.RegisterType<IJobProcessorService, JobProcessorService>();
+            container.RegisterType<IJobLogsService, JobLogsService>();
+            container.RegisterType<ILogsRepository, LogsRepository>(); 
         }
     }
 }

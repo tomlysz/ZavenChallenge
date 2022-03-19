@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+using ZavenDotNetInterview.App.Extensions;
 using ZavenDotNetInterview.App.Models;
 using ZavenDotNetInterview.App.Models.Context;
 using ZavenDotNetInterview.App.Models.ViewModels;
@@ -14,9 +15,12 @@ namespace ZavenDotNetInterview.App.Controllers
     public class JobsController : Controller
     {
         private readonly IJobProcessorService _jobProcessorService;
-        public JobsController(IJobProcessorService jobProcessorService)
+        private readonly ILogsRepository _logsRepository;
+        public JobsController(IJobProcessorService jobProcessorService,
+            ILogsRepository logsRepository)
         {
             _jobProcessorService = jobProcessorService;
+            _logsRepository = logsRepository;
         }
 
         // GET: Tasks
@@ -64,7 +68,11 @@ namespace ZavenDotNetInterview.App.Controllers
 
                         Job newJob = new Job() { Id = Guid.NewGuid(), DoAfter = data.DoAfter, Name = data.Name, Status = JobStatus.New };
                         newJob = _ctx.Jobs.Add(newJob);
-                        _ctx.SaveChanges();
+
+                        if (_ctx.SaveChanges() >0)
+                        {
+                            _logsRepository.InsertLog(new Log { Id = Guid.NewGuid(), CreatedAt = DateTime.Now, Description = JobStatus.New.GetEnumDescription<JobStatus>(), Job = newJob, JobId = newJob.Id });
+                        }
                     }
 
                     return RedirectToAction("Index");

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Web;
 
@@ -16,9 +17,13 @@ namespace ZavenDotNetInterview.App.Models
 
     public enum JobStatus
     {
+        [Description("Failed")]
         Failed = -1,
+        [Description("New")]
         New = 0,
+        [Description("InProgress")]
         InProgress = 1,
+        [Description("Done")]
         Done = 2
     }
 }

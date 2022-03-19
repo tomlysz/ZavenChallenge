@@ -13,10 +13,13 @@ namespace ZavenDotNetInterview.App.Services
     public class JobProcessorService : IJobProcessorService
     {
         private ZavenDotNetInterviewContext _ctx;
+        private readonly IJobLogsService _logsService;
 
-        public JobProcessorService(ZavenDotNetInterviewContext ctx)
+        public JobProcessorService(ZavenDotNetInterviewContext ctx, 
+            IJobLogsService logsService)
         {
             _ctx = ctx;
+            _logsService = logsService;
         }
 
         public void ProcessJobs()
@@ -25,7 +28,7 @@ namespace ZavenDotNetInterview.App.Services
             var allJobs = jobsRepository.GetAllJobs();
             var jobsToProcess = allJobs.Where(x => x.Status == JobStatus.New).ToList();
 
-            jobsToProcess.ForEach(job => job.ChangeStatus(JobStatus.InProgress));
+            jobsToProcess.ForEach(job => job.ChangeStatus(_logsService, JobStatus.InProgress));
                         
             _ctx.SaveChanges();
 
@@ -36,12 +39,12 @@ namespace ZavenDotNetInterview.App.Services
                     bool result = await this.ProcessJob(currentjob).ConfigureAwait(false);
                     if (result)
                     {
-                        currentjob.ChangeStatus(JobStatus.Done);
+                        currentjob.ChangeStatus(_logsService, JobStatus.Done);
                     }
                     else
                     {
                         _ctx.SaveChanges();
-                        currentjob.ChangeStatus(JobStatus.Failed);
+                        currentjob.ChangeStatus(_logsService, JobStatus.Failed);
                     }
                 }).Start();
             });
