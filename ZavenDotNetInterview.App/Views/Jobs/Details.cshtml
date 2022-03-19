@@ -1,7 +1,51 @@
-﻿@*TODO: Use Razor Syntax*@
+﻿@model ZavenDotNetInterview.App.Models.ViewModels.JobDetailsViewModel
 @{
     ViewBag.Title = "Details";
 }
 
 <h2>Details</h2>
 
+<div class="container">
+    <div class="col-lg-6">
+        <div class="form-group">
+            @Html.Label("Name")
+            @Html.TextBoxFor(c => c.Name, new { @class = "form-control", disabled = true })
+        </div>
+        <div class="form-group">
+            @Html.Label("Status")
+            @Html.TextBoxFor(c => c.Status, new { @class = "form-control", disabled = true })
+        </div>
+        <div class="form-group">
+            @Html.Label("Start Date")
+            @Html.TextBoxFor(c => c.DoAfterStr, new { @class = "form-control", disabled = true })
+        </div>
+        <div class="form-group">
+            @Html.Label("Last Update Date")
+            @Html.TextBoxFor(c => c.LastUpdatedAtStr, new { @class = "form-control", disabled = true })
+        </div>
+    </div>
+    <div class="col-lg-6">
+        <table class="table table-striped">
+            <tr>
+                <th>
+                    @Html.DisplayName("Date")
+                </th>
+                <th>
+                    @Html.DisplayName("Description")
+                </th>
+            </tr>
+
+            @foreach (var log in Model.Logs)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(model => log.CreatedAt)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(model => log.Description)
+                    </td>
+                </tr>
+            }
+        </table>
+    </div>
+</div>

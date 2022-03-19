@@ -21,5 +21,13 @@ namespace ZavenDotNetInterview.App.Repositories
         {
             return _ctx.Jobs.ToList();
         }
+
+        public Job GetJob(Guid guid)
+        {
+            var result = _ctx.Jobs
+                .SingleOrDefault(r => r.Id == guid);
+
+            return result;
+        }
     }
 }

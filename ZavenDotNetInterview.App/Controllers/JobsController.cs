@@ -15,12 +15,14 @@ namespace ZavenDotNetInterview.App.Controllers
     public class JobsController : Controller
     {
         private readonly IJobProcessorService _jobProcessorService;
+        private readonly IJobService _jobService;
         private readonly ILogsRepository _logsRepository;
         public JobsController(IJobProcessorService jobProcessorService,
-            ILogsRepository logsRepository)
+            ILogsRepository logsRepository, IJobService jobService)
         {
             _jobProcessorService = jobProcessorService;
             _logsRepository = logsRepository;
+            _jobService = jobService;
         }
 
         // GET: Tasks
@@ -87,7 +89,8 @@ namespace ZavenDotNetInterview.App.Controllers
 
         public ActionResult Details(Guid jobId)
         {
-            return View();
+            var result = _jobService.GetJobDetails(jobId);
+            return View(result);
         }
     }
 }
