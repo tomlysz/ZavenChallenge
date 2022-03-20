@@ -45,12 +45,12 @@ namespace ZavenDotNetInterview.App.Controllers
         // GET: Tasks/Create
         public ActionResult Create()
         {
-            return View(new JobDataViewModel());
+            return View(new JobCreateDataViewModel());
         }
 
         // POST: Tasks/Create
         [HttpPost]
-        public ActionResult Create(JobDataViewModel data)
+        public ActionResult Create(JobCreateDataViewModel data)
         {
             if (ModelState.IsValid)
             {

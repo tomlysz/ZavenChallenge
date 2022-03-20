@@ -1,9 +1,9 @@
-﻿@model ZavenDotNetInterview.App.Models.ViewModels.JobDataViewModel
+﻿@model ZavenDotNetInterview.App.Models.ViewModels.JobCreateDataViewModel
 @{
-    ViewBag.Title = "Create";
+    ViewBag.Title = "Create job";
 }
 
-<h2>Create</h2>
+<h2>Create job</h2>
 
 <div class="container">
     <div class=" col-lg-8">
@@ -13,14 +13,14 @@
                 <label for="Name">
                     Name:
                 </label>
-                <input class="form-control" type="text" name="Name" placeholder="Name" />
+                <input class="form-control" type="text" name="Name" placeholder="Name" value="@Model.Name"/>
                 <h5 id="nameVal" class="text-danger" />
             </div>
             <div class="form-group">
                 <label for="DoAfter">
                     Do after:
                 </label>
-                <input class="form-control" type="datetime" name="DoAfter" placeholder="RRRR-MM-DD" />
+                <input class="form-control" type="datetime" name="DoAfter" placeholder="RRRR-MM-DD" value="@Model.DoAfterStr"/>
                 <h5 id="doAfterVal" class="text-danger" />
             </div>            
             <input class="btn btn-success" id="sendForm" type="submit" value="Add Task" />
@@ -67,7 +67,7 @@
 
                 if (doAfter !== '') {
                     if (!isDate) {
-                        showText(valTextSelector, 'It is not a valid date.');
+                        showText(valTextSelector, 'It is not a valid date. Example: yyyy-mm-dd');
                         return false;
                     } else {
                         showText(valTextSelector, '');
