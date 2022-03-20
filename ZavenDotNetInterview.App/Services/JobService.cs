@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
+using ZavenDotNetInterview.App.Extensions;
 using ZavenDotNetInterview.App.Models;
 using ZavenDotNetInterview.App.Models.ViewModels;
 using ZavenDotNetInterview.App.Repositories;
@@ -17,6 +18,23 @@ namespace ZavenDotNetInterview.App.Services
             _jobsRepository = jobsRepository;
         }
 
+        public List<JobViewModel> GetJobs()
+        {
+            var jobs = _jobsRepository.GetAllJobs();
+
+            var result = jobs
+                .OrderBy(j=>j.Logs.First(l=>l.Description == JobStatus.New.GetEnumDescription<JobStatus>()).CreatedAt)
+                .Select(j =>
+                new JobViewModel
+                {
+                    Id = j.Id,
+                    Name = j.Name,
+                    Status = j.Status
+                }).ToList();
+
+            return result;
+        }
+
         public JobDetailsViewModel GetJobDetails(Guid guid)
         {
             var job = _jobsRepository.GetJob(guid);
@@ -25,7 +43,7 @@ namespace ZavenDotNetInterview.App.Services
                 return new JobDetailsViewModel();
 
             var logList = MapLogs(job.Logs);
-            var result = MapJob(job, logList.OrderBy(l => l.CreatedAt).ToList());           
+            var result = MapJob(job, logList.OrderBy(l => l.CreatedAt).ToList());
 
             return result;
         }

@@ -28,12 +28,9 @@ namespace ZavenDotNetInterview.App.Controllers
         // GET: Tasks
         public ActionResult Index()
         {
-            using (ZavenDotNetInterviewContext _ctx = new ZavenDotNetInterviewContext())
-            {
-                JobsRepository jobsRepository = new JobsRepository(_ctx);
-                List<Job> jobs = jobsRepository.GetAllJobs();
-                return View(jobs);
-            }
+            var result = _jobService.GetJobs();
+            return View(result);
+
         }
 
         // POST: Tasks/Process
@@ -47,7 +44,7 @@ namespace ZavenDotNetInterview.App.Controllers
 
         // GET: Tasks/Create
         public ActionResult Create()
-        {            
+        {
             return View(new JobDataViewModel());
         }
 
@@ -62,7 +59,7 @@ namespace ZavenDotNetInterview.App.Controllers
                     using (ZavenDotNetInterviewContext _ctx = new ZavenDotNetInterviewContext())
                     {
                         var jobFromDb = _ctx.Jobs.FirstOrDefault(j => j.Name == data.Name);
-                        if(jobFromDb!= null)
+                        if (jobFromDb != null)
                         {
                             ModelState.AddModelError("Name", "Name is already taken.");
                             return View(data);
@@ -71,7 +68,7 @@ namespace ZavenDotNetInterview.App.Controllers
                         Job newJob = new Job() { Id = Guid.NewGuid(), DoAfter = data.DoAfter, Name = data.Name, Status = JobStatus.New, LastUpdatedAt = DateTime.UtcNow };
                         newJob = _ctx.Jobs.Add(newJob);
 
-                        if (_ctx.SaveChanges() >0)
+                        if (_ctx.SaveChanges() > 0)
                         {
                             _logsRepository.InsertLog(new Log { Id = Guid.NewGuid(), CreatedAt = DateTime.Now, Description = JobStatus.New.GetEnumDescription<JobStatus>(), Job = newJob, JobId = newJob.Id });
                         }
