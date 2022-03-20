@@ -8,5 +8,7 @@ namespace ZavenDotNetInterview.App.Services
     {
         JobDetailsViewModel GetJobDetails(Guid guid);
         List<JobViewModel> GetJobs();
+        void CreateJob(JobCreateDataViewModel data);
+        bool IfJobExists(string jobName);
     }
 }

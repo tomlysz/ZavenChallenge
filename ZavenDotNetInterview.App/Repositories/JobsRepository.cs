@@ -29,5 +29,11 @@ namespace ZavenDotNetInterview.App.Repositories
 
             return result;
         }
+
+        public int CreateJob(Job job)
+        {
+            _ctx.Jobs.Add(job);
+            return _ctx.SaveChanges();
+        }
     }
 }

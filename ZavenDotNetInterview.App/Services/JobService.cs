@@ -12,10 +12,13 @@ namespace ZavenDotNetInterview.App.Services
     public class JobService : IJobService
     {
         private readonly IJobsRepository _jobsRepository;
+        private readonly ILogsRepository _logsRepository;
 
-        public JobService(IJobsRepository jobsRepository)
+        public JobService(IJobsRepository jobsRepository,
+            ILogsRepository logsRepository)
         {
             _jobsRepository = jobsRepository;
+            _logsRepository = logsRepository;
         }
 
         public List<JobViewModel> GetJobs()
@@ -23,7 +26,7 @@ namespace ZavenDotNetInterview.App.Services
             var jobs = _jobsRepository.GetAllJobs();
 
             var result = jobs
-                .OrderBy(j=>j.Logs.First(l=>l.Description == JobStatus.New.GetEnumDescription<JobStatus>()).CreatedAt)
+                .OrderBy(j => j.Logs.First(l => l.Description == JobStatus.New.GetEnumDescription<JobStatus>()).CreatedAt)
                 .Select(j =>
                 new JobViewModel
                 {
@@ -46,6 +49,40 @@ namespace ZavenDotNetInterview.App.Services
             var result = MapJob(job, logList.OrderBy(l => l.CreatedAt).ToList());
 
             return result;
+        }
+
+        public void CreateJob(JobCreateDataViewModel data)
+        {
+            Job newJob = new Job()
+            {
+                Id = Guid.NewGuid(),
+                DoAfter = data.DoAfter,
+                Name = data.Name,
+                Status = JobStatus.New,
+                LastUpdatedAt = DateTime.UtcNow
+            };
+
+            int result = _jobsRepository.CreateJob(newJob);
+
+            if (result > 0)
+            {
+                _logsRepository.InsertLog(
+                    new Log
+                    {
+                        Id = Guid.NewGuid(),
+                        CreatedAt = DateTime.UtcNow,
+                        Description = JobStatus.New.GetEnumDescription<JobStatus>(),
+                        Job = newJob,
+                        JobId = newJob.Id
+                    });
+            }
+        }
+
+        public bool IfJobExists(string jobName)
+        {
+            var jobs = _jobsRepository.GetAllJobs();
+
+            return jobs.FirstOrDefault(j => j.Name == jobName) != null ? true : false;
         }
 
         private List<LogViewModel> MapLogs(List<Log> logs)

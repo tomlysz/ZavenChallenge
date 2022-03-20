@@ -8,5 +8,6 @@ namespace ZavenDotNetInterview.App.Repositories
     {
         List<Job> GetAllJobs();
         Job GetJob(Guid guid);
+        int CreateJob(Job job);
     }
 }
