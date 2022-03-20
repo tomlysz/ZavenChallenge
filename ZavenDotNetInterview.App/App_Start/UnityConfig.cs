@@ -45,8 +45,9 @@ namespace ZavenDotNetInterview.App
             // container.LoadConfiguration();
 
             // TODO: Register your type's mappings here.
-            container.RegisterType<IJobsRepository, JobsRepository>(new ContainerControlledLifetimeManager());
-            container.RegisterInstance<ZavenDotNetInterviewContext>(new ZavenDotNetInterviewContext(), InstanceLifetime.Singleton);
+            container.RegisterType<IJobsRepository, JobsRepository>();
+            //container.RegisterInstance<ZavenDotNetInterviewContext>(new ZavenDotNetInterviewContext(), InstanceLifetime.Singleton);
+            container.RegisterType<ZavenDotNetInterviewContext>(new PerResolveLifetimeManager());
             container.RegisterType<IJobProcessorService, JobProcessorService>();
             container.RegisterType<IJobLogsService, JobLogsService>();
             container.RegisterType<IJobService, JobService>();            

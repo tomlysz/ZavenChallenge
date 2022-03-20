@@ -26,13 +26,13 @@ namespace ZavenDotNetInterview.App.Services
         {
             IJobsRepository jobsRepository = new JobsRepository(_ctx);
             var allJobs = jobsRepository.GetAllJobs();
-            var jobsToProcess = allJobs.Where(x => x.Status == JobStatus.New).ToList();
+            var jobsToProcess = allJobs.Where(x => x.Status == JobStatus.New || x.Status == JobStatus.Failed).ToList();
 
             jobsToProcess.ForEach(job => job.ChangeStatus(_logsService, JobStatus.InProgress));
                         
             _ctx.SaveChanges();
 
-            var asd = Parallel.ForEach(jobsToProcess, (currentjob) =>
+            Parallel.ForEach(jobsToProcess, (currentjob) =>
             {
                 new Task(async () =>
                 {
@@ -43,8 +43,7 @@ namespace ZavenDotNetInterview.App.Services
                     }
                     else
                     {
-                        _ctx.SaveChanges();
-                        currentjob.ChangeStatus(_logsService, JobStatus.Failed);
+                        currentjob.ChangeStatus(_logsService, JobStatus.Failed);   
                     }
                 }).Start();
             });
