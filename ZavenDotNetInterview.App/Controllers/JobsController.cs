@@ -1,32 +1,27 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
 using System.Web.Mvc;
-using ZavenDotNetInterview.App.Models;
-using ZavenDotNetInterview.App.Models.Context;
-using ZavenDotNetInterview.App.Repositories;
-using ZavenDotNetInterview.App.Services;
+using ZavenDotNetInterview.Domain.Models.ViewModels;
+using ZavenDotNetInterview.Domain.Interfaces;
 
 namespace ZavenDotNetInterview.App.Controllers
 {
     public class JobsController : Controller
     {
         private readonly IJobProcessorService _jobProcessorService;
-        public JobsController(IJobProcessorService jobProcessorService)
+        private readonly IJobService _jobService;
+        public JobsController(IJobProcessorService jobProcessorService, 
+            IJobService jobService)
         {
             _jobProcessorService = jobProcessorService;
+            _jobService = jobService;
         }
 
         // GET: Tasks
         public ActionResult Index()
         {
-            using (ZavenDotNetInterviewContext _ctx = new ZavenDotNetInterviewContext())
-            {
-                JobsRepository jobsRepository = new JobsRepository(_ctx);
-                List<Job> jobs = jobsRepository.GetAllJobs();
-                return View(jobs);
-            }
+            var result = _jobService.GetJobs();
+            return View(result);
+
         }
 
         // POST: Tasks/Process
@@ -41,33 +36,39 @@ namespace ZavenDotNetInterview.App.Controllers
         // GET: Tasks/Create
         public ActionResult Create()
         {
-            return View();
+            return View(new JobCreateDataViewModel());
         }
 
         // POST: Tasks/Create
         [HttpPost]
-        public ActionResult Create(string name, DateTime doAfter)
+        public ActionResult Create(JobCreateDataViewModel data)
         {
-            try
+            var jobExistsInDb = _jobService.IfJobExists(data.Name);
+            if (jobExistsInDb)
             {
-                using (ZavenDotNetInterviewContext _ctx = new ZavenDotNetInterviewContext())
-                {
-                    Job newJob = new Job() { Id = Guid.NewGuid(), DoAfter = doAfter, Name = name, Status = JobStatus.New };
-                    newJob = _ctx.Jobs.Add(newJob);
-                    _ctx.SaveChanges();
-                }
+                ModelState.AddModelError("Name", "Name is already taken.");
+            }
 
-                return RedirectToAction("Index");
-            }
-            catch
+            if (ModelState.IsValid)
             {
-                return View();
+                try
+                {
+                    _jobService.CreateJob(data);
+                    return RedirectToAction("Index");
+                }
+                catch
+                {
+                    ModelState.AddModelError("","Something went wrong.");
+                    return View(data);
+                }
             }
+            return View(data);
         }
 
         public ActionResult Details(Guid jobId)
         {
-            return View();
+            var result = _jobService.GetJobDetails(jobId);
+            return View(result);
         }
     }
 }

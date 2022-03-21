@@ -1,4 +1,4 @@
-﻿namespace ZavenDotNetInterview.App.Services
+﻿namespace ZavenDotNetInterview.Domain.Interfaces
 {
     public interface IJobProcessorService
     {

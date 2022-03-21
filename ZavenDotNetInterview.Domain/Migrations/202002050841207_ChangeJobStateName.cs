@@ -1,4 +1,4 @@
-﻿namespace ZavenDotNetInterview.App.Migrations
+﻿namespace ZavenDotNetInterview.Domain.Migrations
 {
     using System;
     using System.Data.Entity.Migrations;
