@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
 using ZavenDotNetInterview.App.Models;
 using ZavenDotNetInterview.App.Services;
 
@@ -14,17 +11,27 @@ namespace ZavenDotNetInterview.App.Extensions
             job.Status = newStatus;
         }
 
-        public static void ChangeStatus(this Job job, IJobLogsService logsService, JobStatus newStatus)
+        public static void ChangeStatus(this Job job, ILogsService logsService, JobStatus newStatus)
         {
-            job.CheckFailedStatus(ref newStatus);
-            job.Status = newStatus;
-            job.LastUpdatedAt = DateTime.UtcNow;            
+            ChangeJobStatus(job, newStatus);
+            AddLog(logsService, job.Id, newStatus);
 
-            string description = newStatus.GetEnumDescription<JobStatus>();
-            logsService.InsertLog(job.Id, description);
+            ChangeSatusToClose(job, logsService, newStatus);
         }
 
-        private static JobStatus CheckFailedStatus(this Job job, ref JobStatus newStatus)
+        private static void AddLog(ILogsService logsService, Guid jobId, JobStatus status)
+        {
+            string description = status.GetEnumDescription<JobStatus>();
+            logsService.InsertLog(jobId, description);
+        }
+
+        private static void ChangeJobStatus(Job job, JobStatus status)
+        {
+            job.Status = status;
+            job.LastUpdatedAt = DateTime.UtcNow;
+        }
+
+        private static void ChangeSatusToClose(Job job, ILogsService logsService, JobStatus newStatus)
         {
             if (newStatus == JobStatus.Failed)
             {
@@ -32,10 +39,11 @@ namespace ZavenDotNetInterview.App.Extensions
                 job.FailedAttemptionCount = failedAttempt + 1;
 
                 if (job.FailedAttemptionCount == 5)
-                    return JobStatus.Closed;
+                {
+                    ChangeJobStatus(job, JobStatus.Closed);
+                    AddLog(logsService, job.Id, JobStatus.Closed);
+                }
             }
-            return newStatus;
-
         }
     }
 }

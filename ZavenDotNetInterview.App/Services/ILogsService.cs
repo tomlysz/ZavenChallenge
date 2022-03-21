@@ -3,7 +3,7 @@ using ZavenDotNetInterview.App.Models;
 
 namespace ZavenDotNetInterview.App.Services
 {
-    public interface IJobLogsService
+    public interface ILogsService
     {
         Log InsertLog(Guid jobId, string description);
     }

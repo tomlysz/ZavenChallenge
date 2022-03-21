@@ -7,11 +7,11 @@ using ZavenDotNetInterview.App.Repositories;
 
 namespace ZavenDotNetInterview.App.Services
 {
-    public class JobLogsService : IJobLogsService
+    public class LogsService : ILogsService
     {
         private readonly ILogsRepository _logsRepo;
 
-        public JobLogsService(ILogsRepository logsRepo)
+        public LogsService(ILogsRepository logsRepo)
         {
             _logsRepo = logsRepo;
         }

@@ -1,8 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
-using System.Web;
 using ZavenDotNetInterview.App.Extensions;
 using ZavenDotNetInterview.App.Models;
 using ZavenDotNetInterview.App.Models.Context;
@@ -13,10 +12,10 @@ namespace ZavenDotNetInterview.App.Services
     public class JobProcessorService : IJobProcessorService
     {
         private ZavenDotNetInterviewContext _ctx;
-        private readonly IJobLogsService _logsService;
+        private readonly ILogsService _logsService;
 
         public JobProcessorService(ZavenDotNetInterviewContext ctx,
-            IJobLogsService logsService)
+            ILogsService logsService)
         {
             _ctx = ctx;
             _logsService = logsService;
@@ -28,7 +27,8 @@ namespace ZavenDotNetInterview.App.Services
             var allJobs = jobsRepository.GetAllJobs();
             var jobsToProcess =
                 allJobs
-                .Where(x => DateTime.UtcNow > x.DoAfter && (x.Status == JobStatus.New || x.Status == JobStatus.Failed))
+                .Where(x => (DateTime.UtcNow > x.DoAfter || !x.DoAfter.HasValue)
+                && (x.Status == JobStatus.New || x.Status == JobStatus.Failed))
                 .ToList();
 
             jobsToProcess.ForEach(job => job.ChangeStatus(_logsService, JobStatus.InProgress));
@@ -37,34 +37,31 @@ namespace ZavenDotNetInterview.App.Services
 
             Parallel.ForEach(jobsToProcess, (currentjob) =>
             {
-                new Task(async () =>
+                bool result = this.ProcessJob();
+                if (result)
                 {
-                    bool result = await this.ProcessJob(currentjob).ConfigureAwait(false);
-                    if (result)
-                    {
-                        currentjob.ChangeStatus(_logsService, JobStatus.Done);
-                    }
-                    else
-                    {
-                        currentjob.ChangeStatus(_logsService, JobStatus.Failed);
-                    }
-                }).Start();
+                    currentjob.ChangeStatus(_logsService, JobStatus.Done);
+                }
+                else
+                {
+                    currentjob.ChangeStatus(_logsService, JobStatus.Failed);
+                }
             });
 
             _ctx.SaveChanges();
         }
 
-        private async Task<bool> ProcessJob(Job job)
+        private bool ProcessJob()
         {
             Random rand = new Random();
             if (rand.Next(10) < 5)
             {
-                await Task.Delay(2000);
+                Thread.Sleep(2000);
                 return false;
             }
             else
             {
-                await Task.Delay(1000);
+                Thread.Sleep(1000);
                 return true;
             }
         }
