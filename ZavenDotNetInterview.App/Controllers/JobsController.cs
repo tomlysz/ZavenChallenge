@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Web.Mvc;
-using ZavenDotNetInterview.App.Models.ViewModels;
-using ZavenDotNetInterview.App.Services;
+using ZavenDotNetInterview.Domain.Models.ViewModels;
+using ZavenDotNetInterview.Domain.Interfaces;
 
 namespace ZavenDotNetInterview.App.Controllers
 {

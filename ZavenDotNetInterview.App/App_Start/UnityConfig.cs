@@ -2,9 +2,10 @@ using System;
 
 using Unity;
 using Unity.Lifetime;
-using ZavenDotNetInterview.App.Models.Context;
-using ZavenDotNetInterview.App.Repositories;
-using ZavenDotNetInterview.App.Services;
+using ZavenDotNetInterview.Domain.Interfaces;
+using ZavenDotNetInterview.Domain.Models.Context;
+using ZavenDotNetInterview.Domain.Repositories;
+using ZavenDotNetInterview.Domain.Services;
 
 namespace ZavenDotNetInterview.App
 {
